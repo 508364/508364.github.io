@@ -19,6 +19,7 @@
         <div class="version">v1.0.0</div>
       </footer>
     </div>
+    <router-view />
   </div>
 </template>
 

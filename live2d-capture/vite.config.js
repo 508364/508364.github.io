@@ -9,12 +9,17 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     }
   },
+  build: {
+    outDir: '../docs',
+    emptyOutDir: true,
+    rollupOptions: {
+      input: {
+        main: fileURLToPath(new URL('./index.html', import.meta.url))
+      }
+    }
+  },
   server: {
     port: 3000,
     host: true
-  },
-  build: {
-    outDir: '../docs', // 为了GitHub Pages
-    emptyOutDir: true
   }
 })
