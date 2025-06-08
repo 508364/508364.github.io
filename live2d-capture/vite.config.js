@@ -3,6 +3,9 @@ import vue from '@vitejs/plugin-vue'
 import { fileURLToPath, URL } from 'url'
 
 export default defineConfig({
+    optimizeDeps: {
+    exclude: ['live2d-webgl-sdk']
+  },
   plugins: [vue()],
   resolve: {
     alias: {

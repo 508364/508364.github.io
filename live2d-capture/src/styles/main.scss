@@ -20,3 +20,33 @@
 [data-theme="tech-blue"] {
   --card-bg: rgba(15, 22, 33, 0.8);
 }
+
+.el-form-item {
+  margin-bottom: 18px;
+  &__label {
+    line-height: 1.5;
+  }
+}
+
+// 布局容器
+.app-container {
+  display: grid;
+  grid-template-columns: 250px 1fr;
+  gap: 20px;
+  padding: 20px;
+}
+
+// 卡片统一样式
+.w3-card {
+  padding: 16px;
+  margin-bottom: 20px;
+  background: var(--card-bg);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+}
+
+@media (max-width: 768px) {
+  .app-container {
+    grid-template-columns: 1fr;
+  }
+}

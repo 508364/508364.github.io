@@ -1,71 +1,136 @@
 <template>
-  <div class="camera-preview w3-card w3-padding">
-    <h3>摄像头预览</h3>
-    <video ref="video" autoplay muted playsinline class="w3-responsive"></video>
-    <div class="w3-margin-top">
-      <el-button @click="toggleCamera" type="primary" size="small">
-        {{ isCameraActive ? '关闭摄像头' : '开启摄像头' }}
-      </el-button>
-    </div>
+  <div class="camera-preview">
+    <video 
+      ref="videoEl" 
+      autoplay 
+      muted 
+      playsinline
+      :class="{ 'video-active': isActive }"
+    ></video>
+    <el-button 
+      @click="toggleCamera" 
+      type="primary"
+      :disabled="isLoading"
+      :icon="isActive ? 'VideoPause' : 'VideoPlay'"
+    >
+      {{ isActive ? '关闭摄像头' : '开启摄像头' }}
+      <span v-if="isLoading" class="loading-text">(加载中...)</span>
+    </el-button>
+    <div v-if="error" class="error-message">{{ error }}</div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
-import { ElButton } from 'element-plus'
+import { ref, onUnmounted } from 'vue';
+import { ElButton } from 'element-plus';
+import { ref, onUnmounted, onMounted } from 'vue';
 
-const video = ref(null)
-const isCameraActive = ref(false)
-let stream = null
+const videoEl = ref(null);
+const isActive = ref(false);
+const isLoading = ref(false);
+const error = ref('');
+let stream = null;
 
 const toggleCamera = async () => {
-  if (isCameraActive.value) {
-    stopCamera()
+  if (isActive.value) {
+    stopCamera();
   } else {
-    await startCamera()
+    await startCamera();
   }
-}
+};
 
 const startCamera = async () => {
   try {
+    isLoading.value = true;
+    error.value = '';
+    
     stream = await navigator.mediaDevices.getUserMedia({ 
-      video: { width: 640, height: 480 } 
-    })
-    video.value.srcObject = stream
-    isCameraActive.value = true
+      video: { 
+        width: { ideal: 1280 },
+        height: { ideal: 720 },
+        facingMode: 'user',
+        frameRate: { ideal: 30 }
+      } 
+    });
+    
+    videoEl.value.srcObject = stream;
+    isActive.value = true;
   } catch (err) {
-    console.error('摄像头访问失败:', err)
-    ElMessage.error('无法访问摄像头: ' + err.message)
+    console.error('摄像头错误:', err);
+    error.value = `无法访问摄像头: ${err.message}`;
+  } finally {
+    isLoading.value = false;
   }
-}
+};
 
 const stopCamera = () => {
   if (stream) {
-    stream.getTracks().forEach(track => track.stop())
-    video.value.srcObject = null
-    isCameraActive.value = false
+    stream.getTracks().forEach(track => {
+      track.stop();
+      track.enabled = false;
+    });
+    stream = null;
   }
-}
-
-onMounted(() => {
-  // 可选: 自动开启摄像头
-  // startCamera()
-})
+  
+  if (videoEl.value) {
+    videoEl.value.srcObject = null;
+  }
+  
+  isActive.value = false;
+};
 
 onUnmounted(() => {
-  stopCamera()
-})
+  stopCamera();
+});
+
+// 添加响应式调整
+const handleResize = () => {
+  if (videoEl.value && isActive.value) {
+    const { width, height } = videoEl.value.getBoundingClientRect();
+    videoEl.value.width = width;
+    videoEl.value.height = height;
+  }
+};
+
+// 可以添加窗口大小变化监听
+ onMounted(() => {
+   window.addEventListener('resize', handleResize);
+ });
+ 
+ onUnmounted(() => {
+   window.removeEventListener('resize', handleResize);
+ });
 </script>
 
 <style scoped>
 .camera-preview {
-  background-color: var(--card-bg);
-}
-
-video {
-  width: 100%;
-  max-height: 300px;
-  background-color: #000;
-  border-radius: 4px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+  
+  video {
+    width: 100%;
+    max-height: 400px;
+    background: #000;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    
+    &.video-active {
+      border: 2px solid var(--el-color-primary);
+    }
+  }
+  
+  .error-message {
+    color: var(--el-color-danger);
+    font-size: 14px;
+    margin-top: 8px;
+  }
+  
+  .loading-text {
+    margin-left: 8px;
+    opacity: 0.7;
+  }
 }
 </style>
