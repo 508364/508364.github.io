@@ -19,7 +19,6 @@ export function useLive2D(canvasRef) {
     currentModel = await Live2DModel.from(modelPath)
     app.stage.addChild(currentModel)
     
-    // 居中显示
     currentModel.position.set(
       app.screen.width / 2,
       app.screen.height / 2
@@ -31,7 +30,6 @@ export function useLive2D(canvasRef) {
   const updateModelParams = (params) => {
     if (!currentModel) return
     
-    // 更新模型参数
     Object.entries(params).forEach(([key, value]) => {
       currentModel.internalModel.coreModel.setParamFloat(key, value)
     })

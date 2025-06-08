@@ -1,23 +1,12 @@
-@import 'variables';
-@import 'themes/light';
-@import 'themes/virtual-purple';
-@import 'themes/tech-blue';
+@use 'variables' as *;
+@use 'themes/light';
+@use 'themes/virtual-purple';
+@use 'themes/tech-blue';
 
 :root {
   --header-bg: var(--primary-color);
   --footer-bg: var(--secondary-color);
   --card-bg: rgba(255, 255, 255, 0.9);
-}
-
-body {
-  margin: 0;
-  padding: 0;
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  background-color: var(--bg-color);
-  color: var(--text-color);
-  transition: all 0.3s ease;
 }
 
 [data-theme="light"] {

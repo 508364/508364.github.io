@@ -9,14 +9,16 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     }
   },
-  build: {
-    outDir: '../docs',
-    emptyOutDir: true,
-    rollupOptions: {
-      input: {
-        main: fileURLToPath(new URL('./index.html', import.meta.url))
+  css: {
+    preprocessorOptions: {
+      scss: {
+        additionalData: `@use "@/styles/variables.scss" as *;`
       }
     }
+  },
+  build: {
+    outDir: '../docs',
+    emptyOutDir: true
   },
   server: {
     port: 3000,
