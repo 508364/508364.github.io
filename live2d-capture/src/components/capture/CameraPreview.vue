@@ -23,7 +23,8 @@
 <script setup>
 import { ref, onUnmounted } from 'vue';
 import { ElButton } from 'element-plus';
-import { ref, onUnmounted, onMounted } from 'vue';
+
+const emit = defineEmits(['error']);
 
 const videoEl = ref(null);
 const isActive = ref(false);
@@ -31,10 +32,19 @@ const isLoading = ref(false);
 const error = ref('');
 let stream = null;
 
+const checkCameraSupport = () => {
+  return !!navigator.mediaDevices?.getUserMedia;
+};
+
 const toggleCamera = async () => {
   if (isActive.value) {
     stopCamera();
   } else {
+    if (!checkCameraSupport()) {
+      error.value = '您的浏览器不支持摄像头访问';
+      emit('error', new Error(error.value));
+      return;
+    }
     await startCamera();
   }
 };
@@ -53,11 +63,16 @@ const startCamera = async () => {
       } 
     });
     
+    if (!videoEl.value) {
+      throw new Error('视频元素未初始化');
+    }
+    
     videoEl.value.srcObject = stream;
     isActive.value = true;
   } catch (err) {
     console.error('摄像头错误:', err);
-    error.value = `无法访问摄像头: ${err.message}`;
+    error.value = `摄像头访问失败: ${err.message}`;
+    emit('error', err);
   } finally {
     isLoading.value = false;
   }
@@ -82,27 +97,10 @@ const stopCamera = () => {
 onUnmounted(() => {
   stopCamera();
 });
-
-// 添加响应式调整
-const handleResize = () => {
-  if (videoEl.value && isActive.value) {
-    const { width, height } = videoEl.value.getBoundingClientRect();
-    videoEl.value.width = width;
-    videoEl.value.height = height;
-  }
-};
-
-// 可以添加窗口大小变化监听
- onMounted(() => {
-   window.addEventListener('resize', handleResize);
- });
- 
- onUnmounted(() => {
-   window.removeEventListener('resize', handleResize);
- });
 </script>
 
 <style scoped>
+/* 保持原有样式不变 */
 .camera-preview {
   position: relative;
   display: flex;

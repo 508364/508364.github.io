@@ -1,13 +1,22 @@
 <template>
-  <div class="model-viewer">
+  <div class="live2d-viewer">
     <canvas ref="canvasEl"></canvas>
     <div v-if="loading" class="loading-overlay">
       <el-icon class="loading-icon"><Loading /></el-icon>
-      <span>模型加载中...</span>
+      <span>Live2D模型加载中...</span>
     </div>
     <div v-if="error" class="error-overlay">
       <el-icon class="error-icon"><Warning /></el-icon>
       <span>{{ error }}</span>
+      <el-button 
+        v-if="showRetry" 
+        type="primary" 
+        size="small" 
+        @click="retryLoad"
+        class="retry-button"
+      >
+        重试
+      </el-button>
     </div>
   </div>
 </template>
@@ -16,11 +25,15 @@
 import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue';
 import * as PIXI from 'pixi.js';
 import { Loading, Warning } from '@element-plus/icons-vue';
+import { ElButton, ElIcon } from 'element-plus';
 
 const props = defineProps({
   modelUrl: {
     type: String,
-    required: true
+    required: true,
+    validator: (value) => {
+      return value.startsWith('http') || value.startsWith('/');
+    }
   },
   params: {
     type: Object,
@@ -28,91 +41,95 @@ const props = defineProps({
   },
   scale: {
     type: Number,
-    default: 0.15
+    default: 0.15,
+    validator: (value) => value > 0 && value <= 1
+  },
+  autoResize: {
+    type: Boolean,
+    default: true
   }
 });
 
-const emit = defineEmits(['loaded', 'error']);
+const emit = defineEmits(['loaded', 'error', 'retry']);
 
 const canvasEl = ref(null);
 const loading = ref(false);
 const error = ref('');
+const showRetry = ref(false);
 let app = null;
 let currentModel = null;
 let resizeObserver = null;
 
+// 初始化PIXI渲染器
 const initRenderer = async () => {
-  if (!canvasEl.value) return;
-  
   try {
+    if (!canvasEl.value) {
+      throw new Error('Canvas element not found');
+    }
+
     app = new PIXI.Application({
       view: canvasEl.value,
       transparent: true,
       autoStart: true,
       backgroundAlpha: 0,
-      resizeTo: canvasEl.value.parentElement
+      resizeTo: props.autoResize ? canvasEl.value.parentElement : undefined
     });
-    
-    // 初始化后加载模型
+
+    await nextTick();
     await loadModel(props.modelUrl);
-    
-    // 添加窗口大小变化监听
-    setupResizeObserver();
   } catch (err) {
-    console.error('渲染器初始化失败:', err);
-    error.value = `渲染器初始化失败: ${err.message}`;
-    emit('error', err);
+    handleError(err, '渲染器初始化失败');
   }
 };
 
+// 加载Live2D模型
 const loadModel = async (url) => {
   if (!url || !app) return;
   
   try {
+    resetState();
     loading.value = true;
-    error.value = '';
     
     // 清理现有模型
     if (currentModel) {
-      app.stage.removeChild(currentModel);
-      currentModel.destroy({ children: true });
-      currentModel = null;
+      cleanupModel();
     }
     
-    // 等待Live2D核心库加载
+    // 加载Live2D核心库
     await loadLive2DCore();
     
+    // 从URL加载模型
     currentModel = await window.Live2DModel.from(url);
     app.stage.addChild(currentModel);
     
-    // 初始参数设置
+    // 设置模型参数和位置
     updateModelParams(props.params);
-    
-    // 居中显示
     centerModel();
     
     emit('loaded', currentModel);
   } catch (err) {
-    console.error('模型加载失败:', err);
-    error.value = `模型加载失败: ${err.message}`;
-    emit('error', err);
+    handleError(err, '模型加载失败');
+    showRetry.value = true;
   } finally {
     loading.value = false;
   }
 };
 
+// 加载Live2D核心库
 const loadLive2DCore = () => {
   return new Promise((resolve, reject) => {
     if (window.Live2DModel) return resolve();
     
     const script = document.createElement('script');
-    script.src = '/live2d/core/live2dcubismcore.min.js';
+    script.src = 'https://cdn.jsdelivr.net/npm/pixi-live2d-display@latest/dist/live2dcubismcore.min.js';
     script.onload = resolve;
-    script.onerror = () => reject(new Error('Failed to load Live2D core'));
+    script.onerror = () => reject(new Error('Live2D核心库加载失败'));
+    script.id = 'live2d-core-script';
     document.head.appendChild(script);
   });
 };
 
+// 居中显示模型
 const centerModel = () => {
   if (!currentModel || !app) return;
   
@@ -123,6 +140,7 @@ const centerModel = () => {
   currentModel.scale.set(props.scale);
 };
 
+// 更新模型参数
 const updateModelParams = (params) => {
   if (!currentModel) return;
   
@@ -135,47 +153,77 @@ const updateModelParams = (params) => {
   });
 };
 
+// 设置响应式布局
 const setupResizeObserver = () => {
-  if (!canvasEl.value?.parentElement) return;
+  if (!props.autoResize || !canvasEl.value?.parentElement) return;
   
   resizeObserver = new ResizeObserver(() => {
-    if (app) {
-      app.renderer.resize(
-        canvasEl.value.parentElement.clientWidth,
-        canvasEl.value.parentElement.clientHeight
-      );
-      centerModel();
+    if (app && app.renderer) {
+      try {
+        const parent = canvasEl.value.parentElement;
+        app.renderer.resize(
+          parent.clientWidth,
+          parent.clientHeight
+        );
+        centerModel();
+      } catch (err) {
+        console.error('调整大小失败:', err);
+      }
     }
   });
   
   resizeObserver.observe(canvasEl.value.parentElement);
 };
 
+// 清理模型
+const cleanupModel = () => {
+  if (currentModel && app) {
+    app.stage.removeChild(currentModel);
+    currentModel.destroy({ children: true });
+    currentModel = null;
+  }
+};
+
+// 重置状态
+const resetState = () => {
+  error.value = '';
+  showRetry.value = false;
+};
+
+// 错误处理
+const handleError = (err, prefix = '') => {
+  const message = prefix ? `${prefix}: ${err.message}` : err.message;
+  console.error(message, err);
+  error.value = message;
+  emit('error', err);
+};
+
+// 重试加载
+const retryLoad = () => {
+  emit('retry');
+  loadModel(props.modelUrl);
+};
+
 // 初始化
 onMounted(() => {
   initRenderer();
+  if (props.autoResize) {
+    setupResizeObserver();
+  }
 });
 
-// 监听模型URL变化
-watch(() => props.modelUrl, (newUrl) => {
-  if (newUrl) loadModel(newUrl);
-}, { immediate: true });
+// 监听属性变化
+watch(() => props.modelUrl, loadModel);
+watch(() => props.params, updateModelParams, { deep: true });
+watch(() => props.scale, centerModel);
 
-// 监听参数变化
-watch(() => props.params, (newParams) => {
-  updateModelParams(newParams);
-}, { deep: true });
-
-// 监听缩放比例变化
-watch(() => props.scale, () => {
-  centerModel();
-});
-
+// 清理
 onUnmounted(() => {
   if (resizeObserver) {
     resizeObserver.disconnect();
-    resizeObserver = null;
   }
+  
+  cleanupModel();
   
   if (app) {
     app.destroy(true, {
@@ -185,14 +233,22 @@ onUnmounted(() => {
     });
     app = null;
   }
+  
+  // 移除Live2D核心库脚本
+  const script = document.getElementById('live2d-core-script');
+  if (script) {
+    script.remove();
+  }
 });
 </script>
 
 <style scoped>
-.model-viewer {
+.live2d-viewer {
   position: relative;
   width: 100%;
   height: 100%;
+  overflow: hidden;
+  background-color: #f5f5f5;
   
   canvas {
     width: 100%;
@@ -214,17 +270,22 @@ onUnmounted(() => {
     background-color: rgba(0, 0, 0, 0.5);
     color: white;
     font-size: 16px;
-    gap: 8px;
+    gap: 12px;
+    z-index: 10;
   }
   
   .loading-icon {
     animation: rotate 2s linear infinite;
-    font-size: 24px;
+    font-size: 32px;
   }
   
   .error-icon {
     color: var(--el-color-danger);
-    font-size: 24px;
+    font-size: 32px;
+  }
+  
+  .retry-button {
+    margin-top: 16px;
   }
 }
 
