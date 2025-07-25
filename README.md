@@ -1,1 +1,1 @@
-# [508364.github.io](https://www.508364.github.io)
+# [508364.github.io](https://508364.github.io)
