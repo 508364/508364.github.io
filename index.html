@@ -760,7 +760,7 @@
       
       if (!repos) {
         // 获取仓库数据
-        const reposRes = await fetch(`https://api.github.com/users/${config.githubUsername}/repos?sort=updated&per_page=100`);
+        const reposRes = await fetch(`https://api.github.com/users/508364/repos?sort=updated&per_page=100`);
         if (!reposRes.ok) throw new Error('无法获取仓库数据');
         repos = await reposRes.json();
         
@@ -769,7 +769,7 @@
       }
       
       // 排除指定仓库
-      repos = repos.filter(repo => repo.name !== `${config.githubUsername}.github.io` && 
+      repos = repos.filter(repo => repo.name !== `508364.github.io` && 
                                 !repo.name.includes('.github.io') &&
                                 !repo.fork);
       
@@ -1022,3 +1022,4 @@
   </script>
 </body>
 </html>
+
