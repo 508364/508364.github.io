@@ -729,7 +729,7 @@
       
       if (!userData) {
         // 获取用户信息
-        const userRes = await fetch(`https://api.github.com/users/${config.githubUsername}`);
+        const userRes = await fetch(`https://api.github.com/users/508364`);
         if (!userRes.ok) throw new Error('无法获取用户数据');
         userData = await userRes.json();
         
@@ -749,7 +749,7 @@
       // 更新bio链接
       const bioLink = document.getElementById('bio-link');
       if (bioLink) {
-        bioLink.href = `https://github.com/${config.githubUsername}`;
+        bioLink.href = `https://github.com/508364`;
         bioLink.textContent = config.siteDescription;
       } else {
         console.warn('未找到ID为bio-link的元素');
@@ -1022,4 +1022,5 @@
   </script>
 </body>
 </html>
+
 
