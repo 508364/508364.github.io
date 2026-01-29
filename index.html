@@ -6,248 +6,8 @@
     <title>508364's GitHub Projects</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="alternate icon" class="js-site-favicon" type="image/png" href="https://github.githubassets.com/favicons/favicon.png">
-    <style>
-        :root {
-            --bg-color: #ffffff;
-            --text-color: #333333;
-            --card-bg: #f5f5f5;
-            --btn-bg: #0366d6;
-            --btn-text: #ffffff;
-            --modal-bg: rgba(0,0,0,0.5);
-            --toggle-size: 48px;
-            --search-bg: #f0f0f0;
-            --search-border: #ddd;
-        }
-
-        [data-theme="dark"] {
-            --bg-color: #1e1e1e;
-            --text-color: #e0e0e0;
-            --card-bg: #2d2d2d;
-            --btn-bg: #4078c0;
-            --btn-text: #ffffff;
-            --modal-bg: rgba(0,0,0,0.8);
-            --search-bg: #333333;
-            --search-border: #444444;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
-        }
-
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            padding: 1rem;
-            max-width: 1200px;
-            margin: 0 auto;
-            min-height: 100vh;
-            padding-bottom: calc(var(--toggle-size) + 2rem);
-            position: relative;
-        }
-
-        header {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid var(--text-color);
-        } 
-
-        .header-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-        }
-
-        .avatar-container {
-            display: flex;
-            align-items: center;
-            gap: 0.8rem;
-        }
-
-        .avatar {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid var(--btn-bg);
-        }
-
-        .user-info h2 {
-            font-size: 1.2rem;
-            margin-bottom: 0.2rem;
-        }
-
-        .user-info p {
-            font-size: 0.9rem;
-            opacity: 0.7;
-        }
-
-        .lang-select {
-            padding: 0.4rem 0.8rem;
-            background-color: var(--btn-bg);
-            color: var(--btn-text);
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        .search-container {
-            width: 100%;
-            position: relative;
-        }
-
-        .search-input {
-            width: 100%;
-            padding: 0.6rem 1rem 0.6rem 2.5rem;
-            background-color: var(--search-bg);
-            color: var(--text-color);
-            border: 1px solid var(--search-border);
-            border-radius: 4px;
-            outline: none;
-        }
-
-        .search-icon {
-            position: absolute;
-            left: 0.8rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-color);
-            opacity: 0.7;
-        }
-
-        .theme-toggle {
-            position: fixed;
-            left: 1rem;
-            bottom: 1rem;
-            width: var(--toggle-size);
-            height: var(--toggle-size);
-            border-radius: 50%;
-            background-color: var(--btn-bg);
-            color: var(--btn-text);
-            border: none;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 1.2rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-            z-index: 900;
-        }
-
-        .loading, .no-result {
-            text-align: center;
-            padding: 2rem;
-            font-size: 1.2rem;
-            display: none;
-        }
-
-        .no-result {
-            font-size: 1rem;
-            opacity: 0.7;
-        }
-
-        .projects-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 1rem;
-        }
-
-        .project-card {
-            background-color: var(--card-bg);
-            padding: 1.2rem;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .project-card h3 {
-            margin-bottom: 0.5rem;
-            font-size: 1.1rem;
-        }
-
-        .project-card p {
-            margin-bottom: 0.8rem;
-            opacity: 0.8;
-            font-size: 0.9rem;
-        }
-
-        .project-card .lang {
-            font-size: 0.8rem;
-            opacity: 0.7;
-            margin-bottom: 0.8rem;
-        }
-
-        .project-btn {
-            padding: 0.4rem 0.8rem;
-            background-color: var(--btn-bg);
-            color: var(--btn-text);
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.9rem;
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: var(--modal-bg);
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            padding: 1rem;
-        }
-
-        .modal-content {
-            background-color: var(--card-bg);
-            padding: 1.5rem;
-            border-radius: 8px;
-            text-align: center;
-            width: 100%;
-            max-width: 320px;
-        }
-
-        .modal-btn {
-            padding: 0.5rem 1.2rem;
-            margin: 0.4rem;
-            background-color: var(--btn-bg);
-            color: var(--btn-text);
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.9rem;
-        }
-
-        @media (max-width: 480px) {
-            body {
-                padding: 0.8rem;
-            }
-            .projects-container {
-                grid-template-columns: 1fr;
-            }
-            .theme-toggle {
-                width: 42px;
-                height: 42px;
-                font-size: 1rem;
-            }
-            .avatar {
-                width: 40px;
-                height: 40px;
-            }
-            .user-info h2 {
-                font-size: 1rem;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github.min.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <header>
@@ -276,11 +36,56 @@
 
     <div class="modal" id="projectModal">
         <div class="modal-content">
-            <h3 id="modalTitle">请选择操作</h3>
-            <p id="modalDesc">前往项目网页还是代码仓库？</p>
-            <button class="modal-btn" id="gotoWebBtn">项目网页</button>
-            <button class="modal-btn" id="gotoRepoBtn">代码仓库</button>
-            <button class="modal-btn" id="closeModalBtn">关闭</button>
+            <div class="modal-header">
+                <h3 id="modalTitle">项目详情</h3>
+                <button class="modal-close-btn" id="closeModalBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-left">
+                    <div class="readme-section">
+                        <h4>项目说明</h4>
+                        <div class="readme-content" id="readmeContent">
+                            <div class="loading" id="readmeLoading">正在加载说明文档...</div>
+                            <div class="error" id="readmeError" style="display: none;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-right">
+                    <div class="repo-info-section">
+                        <h4>仓库信息</h4>
+                        <div class="repo-info" id="repoInfo">
+                            <div class="info-item">
+                                <span class="info-label">仓库名称:</span>
+                                <span class="info-value" id="repoName"></span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">语言:</span>
+                                <span class="info-value" id="repoLanguage"></span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">创建时间:</span>
+                                <span class="info-value" id="repoCreated"></span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">更新时间:</span>
+                                <span class="info-value" id="repoUpdated"></span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">星标数:</span>
+                                <span class="info-value" id="repoStars"></span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">分支数:</span>
+                                <span class="info-value" id="repoForks"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn" id="gotoRepoBtn">打开仓库</button>
+                <button class="modal-btn" id="gotoWebBtn" style="display: none;">打开网页</button>
+            </div>
         </div>
     </div>
 
@@ -288,227 +93,22 @@
         <i class="fas fa-moon"></i>
     </button>
 
-    <script>
-        // 1. 多语言配置
-        const langConfig = {
-            zh: {
-                pageTitle: "508364 的 GitHub 项目集",
-                loading: "正在加载项目数据...",
-                loadingError: "加载失败：",
-                noDesc: "无项目描述",
-                langText: "开发语言：",
-                viewRepo: "查看仓库",
-                openProject: "打开项目",
-                modalTitle: "请选择操作",
-                modalDesc: "前往项目网页还是代码仓库？",
-                webBtn: "项目网页",
-                repoBtn: "代码仓库",
-                closeBtn: "关闭",
-                searchPlaceholder: "搜索项目名称...",
-                noResult: "未找到匹配的项目",
-                userBio: "GitHub 公开项目合集"
-            },
-            en: {
-                pageTitle: "508364's GitHub Projects",
-                loading: "Loading project data...",
-                loadingError: "Load failed: ",
-                noDesc: "No project description",
-                langText: "Language: ",
-                viewRepo: "View Repository",
-                openProject: "Open Project",
-                modalTitle: "Please Select Action",
-                modalDesc: "Go to project webpage or code repository?",
-                webBtn: "Project Webpage",
-                repoBtn: "Code Repository",
-                closeBtn: "Close",
-                searchPlaceholder: "Search project name...",
-                noResult: "No matching projects found",
-                userBio: "GitHub Public Projects Collection"
-            }
-        };
-        let currentLang = "zh";
-        // DOM 元素获取
-        const dom = {
-            userName: document.getElementById("userName"),
-            userBio: document.getElementById("userBio"),
-            userAvatar: document.getElementById("userAvatar"),
-            loading: document.getElementById("loading"),
-            noResult: document.getElementById("noResult"),
-            searchInput: document.getElementById("searchInput"),
-            modalTitle: document.getElementById("modalTitle"),
-            modalDesc: document.getElementById("modalDesc"),
-            gotoWebBtn: document.getElementById("gotoWebBtn"),
-            gotoRepoBtn: document.getElementById("gotoRepoBtn"),
-            closeModalBtn: document.getElementById("closeModalBtn"),
-            projectsContainer: document.getElementById("projectsContainer"),
-            projectModal: document.getElementById("projectModal"),
-            themeToggle: document.getElementById("themeToggle"),
-            langSelect: document.getElementById("langSelect"),
-            body: document.body
-        };
-
-        // 2. 语言切换 - 修复渲染逻辑
-        function switchLang(lang) {
-            currentLang = lang;
-            const cfg = langConfig[lang];
-            document.title = cfg.pageTitle;
-            dom.userBio.textContent = cfg.userBio;
-            dom.loading.textContent = cfg.loading;
-            dom.searchInput.placeholder = cfg.searchPlaceholder;
-            dom.noResult.textContent = cfg.noResult;
-            dom.modalTitle.textContent = cfg.modalTitle;
-            dom.modalDesc.textContent = cfg.modalDesc;
-            dom.gotoWebBtn.textContent = cfg.webBtn;
-            dom.gotoRepoBtn.textContent = cfg.repoBtn;
-            dom.closeModalBtn.textContent = cfg.closeBtn;
-            // 重新渲染项目
-            if (window.allRepos) renderProjects(window.allRepos, dom.searchInput.value.trim());
+    <!-- 数据映射表配置 -->
+    <script id="configData" type="application/json">
+    {
+        "dataMap": {
+            "chmlfrp": "https://panel.chmlfrp.net/tunnel/download",
+            "chmlfrpwin386": "https://cf-v1.uapis.cn/download/ChmlFrp-0.51.2_251023_windows_386.zip",
+            "chmlfrpwinamd64": "https://cf-v1.uapis.cn/download/ChmlFrp-0.51.2_251023_windows_amd64.zip",
+            "chmlfrpwinarm64": "https://cf-v1.uapis.cn/download/ChmlFrp-0.51.2_251023_windows_arm64.zip",
+            "default": "Hello GitHub Pages!"
         }
-        dom.langSelect.addEventListener("change", (e) => switchLang(e.target.value));
-
-        // 3. 主题切换 - 修复图标切换
-        const sunIcon = '<i class="fas fa-sun"></i>';
-        const moonIcon = '<i class="fas fa-moon"></i>';
-        function initTheme() {
-            if (localStorage.getItem('theme') === 'dark') {
-                dom.body.setAttribute('data-theme', 'dark');
-                dom.themeToggle.innerHTML = sunIcon;
-            } else {
-                dom.themeToggle.innerHTML = moonIcon;
-            }
-        }
-        initTheme();
-        dom.themeToggle.addEventListener('click', () => {
-            const isDark = dom.body.getAttribute('data-theme') === 'dark';
-            if (isDark) {
-                dom.body.removeAttribute('data-theme');
-                localStorage.setItem('theme', 'light');
-                dom.themeToggle.innerHTML = moonIcon;
-            } else {
-                dom.body.setAttribute('data-theme', 'dark');
-                localStorage.setItem('theme', 'dark');
-                dom.themeToggle.innerHTML = sunIcon;
-            }
-        });
-
-        // 4. GitHub 数据拉取 - 全局存储所有项目
-        const blockedProjectName = '508364.github.io';
-        const githubUsername = '508364';
-        const userApiUrl = `https://api.github.com/users/${githubUsername}`;
-        const reposApiUrl = `https://api.github.com/users/${githubUsername}/repos`;
-        window.allRepos = null; // 全局存储所有项目
-
-        // 获取用户头像
-        function fetchUserInfo() {
-            fetch(userApiUrl)
-                .then(res => res.ok ? res.json() : Promise.reject())
-                .then(user => {
-                    dom.userAvatar.src = user.avatar_url;
-                    dom.userName.textContent = user.name || user.login;
-                })
-                .catch(() => {
-                    dom.userAvatar.src = `https://ui-avatars.com/api/?name=${githubUsername}&background=0366d6&color=fff`;
-                });
-        }
-
-        // 判断 Pages 项目
-        function isPagesRepo(repoName) {
-            return repoName === `${githubUsername}.github.io`;
-        }
-
-        // 5. 项目渲染 + 搜索功能 - 核心修复
-        function renderProjects(repos, keyword = '') {
-            dom.projectsContainer.innerHTML = '';
-            const cfg = langConfig[currentLang];
-            // 过滤：屏蔽项目 + 搜索关键词
-            const filtered = repos.filter(repo => {
-                const notBlocked = repo.name !== blockedProjectName;
-                const matchKeyword = keyword === '' || repo.name.toLowerCase().includes(keyword.toLowerCase());
-                return notBlocked && matchKeyword;
-            });
-
-            if (filtered.length === 0) {
-                dom.noResult.style.display = 'block';
-                return;
-            }
-            dom.noResult.style.display = 'none';
-
-            filtered.forEach(repo => {
-                const webUrl = isPagesRepo(repo.name) ? `https://${githubUsername}.github.io` : null;
-                const card = document.createElement('div');
-                card.className = 'project-card';
-                card.innerHTML = `
-                    <h3>${repo.name}</h3>
-                    <p>${repo.description || cfg.noDesc}</p>
-                    <div class="lang">${cfg.langText}${repo.language || 'Unknown'}</div>
-                    ${webUrl 
-                        ? `<button class="project-btn modal-trigger" data-web="${webUrl}" data-repo="${repo.html_url}">${cfg.openProject}</button>` 
-                        : `<a href="${repo.html_url}" target="_blank" class="project-btn">${cfg.viewRepo}</a>`}
-                `;
-                dom.projectsContainer.appendChild(card);
-            });
-
-            // 绑定模态框触发事件 - 修复事件委托，避免动态元素绑定失效
-            dom.projectsContainer.addEventListener('click', (e) => {
-                if (e.target.classList.contains('modal-trigger')) {
-                    const webUrl = e.target.dataset.web;
-                    const repoUrl = e.target.dataset.repo;
-                    // 存储当前项目链接
-                    dom.gotoWebBtn.dataset.url = webUrl;
-                    dom.gotoRepoBtn.dataset.url = repoUrl;
-                    // 显示模态框
-                    dom.projectModal.style.display = 'flex';
-                }
-            });
-        }
-
-        // 搜索输入事件 - 修复实时搜索
-        dom.searchInput.addEventListener('input', (e) => {
-            if (window.allRepos) {
-                renderProjects(window.allRepos, e.target.value.trim());
-            }
-        });
-
-        // 6. 模态框事件 - 修复跳转逻辑
-        dom.gotoWebBtn.addEventListener('click', () => {
-            window.open(dom.gotoWebBtn.dataset.url, '_blank');
-            dom.projectModal.style.display = 'none';
-        });
-        dom.gotoRepoBtn.addEventListener('click', () => {
-            window.open(dom.gotoRepoBtn.dataset.url, '_blank');
-            dom.projectModal.style.display = 'none';
-        });
-        dom.closeModalBtn.addEventListener('click', () => {
-            dom.projectModal.style.display = 'none';
-        });
-        // 点击模态框外部关闭
-        dom.projectModal.addEventListener('click', (e) => {
-            if (e.target === dom.projectModal) {
-                dom.projectModal.style.display = 'none';
-            }
-        });
-
-        // 7. 初始化加载
-        function init() {
-            fetchUserInfo();
-            dom.loading.style.display = 'block';
-            fetch(reposApiUrl)
-                .then(response => {
-                    if (!response.ok) throw new Error(langConfig[currentLang].loadingError);
-                    return response.json();
-                })
-                .then(repos => {
-                    dom.loading.style.display = 'none';
-                    window.allRepos = repos; // 存储所有项目
-                    renderProjects(repos);
-                })
-                .catch(err => {
-                    dom.loading.style.display = 'block';
-                    dom.loading.textContent = `${langConfig[currentLang].loadingError}${err.message}`;
-                });
-        }
-        init();
+    }
     </script>
+    
+    <script src="marked.min.js"></script>
+    <script src="highlight.min.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
 
